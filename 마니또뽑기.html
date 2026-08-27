@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎁 두근두근 마니또 매칭기</title>
+    <!-- Tailwind CSS 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 폰트: Inter 및 나눔스퀘어라운드 느낌의 고딕 적용 -->
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome 아이콘 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 폭죽 애니메이션 라이브러리 (Confetti) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Gowun Dodum', 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #fef2f2 0%, #f0fdf4 50%, #f0f9ff 100%);
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        /* 카드 플립 애니메이션 전용 */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        
+        /* 룰렛 가속 효과를 위한 스타일 */
+        @keyframes roulette-spin {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
+        }
+        .animate-spin-fast {
+            animation: roulette-spin 0.15s infinite linear;
+        }
+        .animate-spin-medium {
+            animation: roulette-spin 0.3s infinite linear;
+        }
+        .animate-spin-slow {
+            animation: roulette-spin 0.6s infinite linear;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-16 text-slate-800">
+
+    <div class="max-w-5xl mx-auto px-4 pt-8">
+        <!-- 메인 헤더 -->
+        <header class="text-center mb-10">
+            <div class="inline-block animate-bounce mb-3">
+                <span class="text-6xl">🎁</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-rose-600 drop-shadow-sm tracking-wide mb-2">
+                두근두근 마니또 추첨판
+            </h1>
+            <p class="text-slate-500 font-medium text-sm md:text-base">
+                중복 없이 안전하고 재미있게, 우리만의 비밀 친구를 매칭해보세요!
+            </p>
+        </header>
+
+        <!-- 마니또 규칙 카드 -->
+        <section class="glass rounded-3xl p-6 md:p-8 shadow-xl mb-10 border-2 border-rose-100">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="bg-rose-100 p-2.5 rounded-2xl text-rose-500 text-xl">
+                    <i class="fa-solid fa-scroll"></i>
+                </div>
+                <h2 class="text-xl md:text-2xl font-bold text-slate-800">마니또 행복 수칙 (3대 규칙)</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 규칙 1 -->
+                <div class="bg-amber-50/70 p-5 rounded-2xl border border-amber-100 flex flex-col items-center text-center shadow-sm">
+                    <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 text-xl font-bold mb-3">
+                        1
+                    </div>
+                    <span class="font-bold text-lg text-slate-800 mb-1">들키지 않고 비밀 도우미</span>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        아무도 모르게 나의 마니또를 관찰하고, 필요할 때 몰래 슬쩍 도와주세요! 🤫
+                    </p>
+                </div>
+                <!-- 규칙 2 -->
+                <div class="bg-emerald-50/70 p-5 rounded-2xl border border-emerald-100 flex flex-col items-center text-center shadow-sm">
+                    <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 text-xl font-bold mb-3">
+                        2
+                    </div>
+                    <span class="font-bold text-lg text-slate-800 mb-1">정성스러운 손편지</span>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        진심과 따스함이 가득 담긴 한 통의 손편지를 작성하여 마음을 전달해보세요. ✍️
+                    </p>
+                </div>
+                <!-- 규칙 3 -->
+                <div class="bg-rose-50/70 p-5 rounded-2xl border border-rose-100 flex flex-col items-center text-center shadow-sm">
+                    <div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-rose-600 text-xl font-bold mb-3">
+                        3
+                    </div>
+                    <span class="font-bold text-lg text-slate-800 mb-1">소박한 사랑의 선물</span>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        상대방을 생각하며 고른 <span class="font-bold text-rose-600">2,000원 ~ 5,000원</span> 사이의 센스있는 선물을 준비해요! 🎁
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- 왼쪽: 명단 입력 및 가이드 (lg:col-span-5) -->
+            <section class="lg:col-span-5 flex flex-col gap-6">
+                <!-- 명단 입력창 -->
+                <div class="glass rounded-3xl p-6 shadow-xl border border-slate-200 flex-1">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">✍️</span>
+                            <h3 class="text-lg font-bold text-slate-800">참여자 명렬 입력</h3>
+                        </div>
+                        <button onclick="loadSampleList()" class="text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all font-bold py-1.5 px-3 rounded-xl border border-slate-200">
+                            샘플 불러오기
+                        </button>
+                    </div>
+                    
+                    <p class="text-xs text-slate-500 mb-3">
+                        한 줄에 한 명씩 <strong class="text-rose-500">학번 이름</strong> 순으로 입력해 주세요. (예: 10101 홍길동)
+                    </p>
+
+                    <textarea id="participantInput" rows="12" 
+                        class="w-full p-4 border border-slate-200 rounded-2xl text-slate-700 focus:outline-none focus:ring-4 focus:ring-rose-200 focus:border-rose-400 transition-all font-mono text-sm resize-none"
+                        placeholder="10101 김철수&#10;10102 이영희&#10;10103 박민수&#10;10104 최혜지..."></textarea>
+                    
+                    <div class="mt-4 flex flex-col gap-2">
+                        <button id="btnGenerate" onclick="startMatchingProcess()" class="w-full bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 text-white font-bold py-4 rounded-2xl hover:opacity-95 transition-all shadow-md shadow-rose-200 flex items-center justify-center gap-2 text-base">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            마니또 매칭 완료하기!
+                        </button>
+                        <button id="btnReset" onclick="resetAll()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2 rounded-xl transition-all text-xs border border-slate-200 hidden">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> 데이터 완전 초기화
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 오른쪽: 추첨 현황판 (lg:col-span-7) -->
+            <section class="lg:col-span-7">
+                <div class="glass rounded-3xl p-6 shadow-xl border border-slate-200 min-h-[480px] flex flex-col">
+                    <!-- 대기 상태 화면 -->
+                    <div id="statusEmpty" class="flex-1 flex flex-col items-center justify-center text-center p-8">
+                        <div class="w-24 h-24 bg-rose-50 rounded-full flex items-center justify-center mb-4 border border-rose-100 animate-pulse">
+                            <span class="text-5xl">💌</span>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-800 mb-2">마니또를 매칭해 주세요</h4>
+                        <p class="text-slate-500 text-sm max-w-sm">
+                            왼쪽에 참여자 명단을 입력한 뒤 '마니또 매칭 완료하기' 버튼을 누르면 실시간 시크릿 확인판이 생성됩니다.
+                        </p>
+                    </div>
+
+                    <!-- 실제 추첨 현황판 (매칭 후 노출) -->
+                    <div id="statusActive" class="hidden flex-1 flex flex-col">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4 mb-4 gap-2">
+                            <div>
+                                <h4 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                                    두근두근 확인 전광판
+                                </h4>
+                                <p class="text-xs text-slate-500 mt-1">자신의 카드를 클릭해서 마니또를 몰래 확인하세요!</p>
+                            </div>
+                            <!-- 확인 통계 -->
+                            <div class="bg-rose-50 text-rose-600 border border-rose-100 rounded-2xl px-3 py-1.5 text-xs font-bold self-start sm:self-auto flex items-center gap-2">
+                                <span>확인 완료</span>
+                                <span id="checkedCount" class="bg-rose-500 text-white rounded-full px-2 py-0.5 text-[10px]">0 / 0</span>
+                            </div>
+                        </div>
+
+                        <!-- 카드 그리드 영역 -->
+                        <div id="cardGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto max-h-[480px] p-1">
+                            <!-- JS를 통해 참가자별 카드 동적 삽입 -->
+                        </div>
+
+                        <!-- 마니또 전체 매칭 공개 (관리자용 토글) -->
+                        <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+                            <span class="text-xs text-slate-400 font-medium">관리자 전용 기능</span>
+                            <button onclick="toggleShowAllResults()" class="text-xs text-slate-500 hover:text-rose-600 font-bold flex items-center gap-1 transition-colors">
+                                <i id="toggleEyeIcon" class="fa-solid fa-eye"></i>
+                                <span id="toggleText">전체 결과 한번에 보기</span>
+                            </button>
+                        </div>
+                        
+                        <!-- 전체 결과 리스트 (기본 숨김) -->
+                        <div id="allResultsContainer" class="hidden mt-4 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm max-h-[250px] overflow-y-auto">
+                            <h5 class="font-bold text-slate-700 mb-2 flex items-center gap-1">
+                                <i class="fa-solid fa-clipboard-list text-rose-500"></i> 전체 마니또 매칭 리스트
+                            </h5>
+                            <ul id="allResultsList" class="divide-y divide-slate-100 text-slate-600">
+                                <!-- 동적 삽입 -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 시크릿 뽑기 확인 팝업 모달 -->
+    <div id="drawModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-100 transform scale-95 opacity-0 transition-all duration-300" id="modalContent">
+            
+            <!-- 모달 상단 헤더 -->
+            <div class="bg-gradient-to-r from-rose-500 to-pink-500 text-white p-5 text-center relative">
+                <h3 class="text-xl font-bold tracking-tight">🤫 내 마니또 확인하기</h3>
+                <p id="modalUserGiver" class="text-rose-100 text-sm mt-1 font-medium">OOO님의 비밀 미션</p>
+            </div>
+
+            <!-- 모달 콘텐츠 영역 -->
+            <div class="p-6 text-center">
+                
+                <!-- 1단계: 추첨 애니메이션 슬롯 머신 -->
+                <div id="animationStage" class="my-8">
+                    <p class="text-sm text-slate-500 mb-4">비밀 상자를 열고 대상 검색하는 중...</p>
+                    
+                    <!-- 룰렛 보드 상자 -->
+                    <div class="relative w-48 h-20 mx-auto overflow-hidden bg-slate-900 rounded-2xl border-4 border-amber-400 shadow-inner flex items-center justify-center">
+                        <!-- 중앙 고정 화살표 지시자 -->
+                        <div class="absolute left-0 right-0 top-0 bottom-0 pointer-events-none flex justify-between items-center px-1 z-10">
+                            <i class="fa-solid fa-caret-right text-amber-400 text-xl"></i>
+                            <i class="fa-solid fa-caret-left text-amber-400 text-xl"></i>
+                        </div>
+                        <!-- 상하 스크롤 룰렛 컨텐츠 -->
+                        <div id="rouletteTrack" class="flex flex-col text-white font-bold text-xl tracking-wide absolute text-center w-full">
+                            <!-- 동적으로 가상 이름들이 스피닝에 삽입됨 -->
+                        </div>
+                    </div>
+
+                    <!-- 애니메이션 시각 장치 -->
+                    <div class="mt-4 flex justify-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse delay-75"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-teal-400 animate-bounce delay-150"></span>
+                    </div>
+                </div>
+
+                <!-- 2단계: 결과 노출 화면 (기본 숨김) -->
+                <div id="resultStage" class="hidden py-4 flex flex-col items-center">
+                    <div class="w-20 h-20 bg-emerald-50 text-emerald-500 border border-emerald-100 rounded-full flex items-center justify-center text-4xl mb-4 animate-bounce">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+
+                    <p class="text-slate-500 text-sm font-semibold">당신이 수호천사가 되어 줄 비밀 친구는 바로...</p>
+                    
+                    <!-- 매칭된 타겟 정보가 기재됨 -->
+                    <div class="my-5 bg-gradient-to-br from-amber-50 to-rose-50 border-2 border-dashed border-rose-300 rounded-2xl px-6 py-4 inline-block shadow-sm">
+                        <span id="targetName" class="text-3xl font-black text-rose-600 drop-shadow-sm">홍길동</span>
+                    </div>
+
+                    <p class="text-xs text-rose-500 bg-rose-50 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-user-secret"></i> 다른 사람에게 절대로 들키지 마세요!
+                    </p>
+                </div>
+
+                <!-- 안내 사항 -->
+                <div class="bg-slate-50 p-3.5 rounded-xl text-left border border-slate-100 mb-6 mt-4">
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        <strong class="text-slate-700">⚠️ 비밀 보장 알림:</strong> <br>
+                        '마니또 확인 완료'를 누르면 창이 닫히며, 본인 이름 카드는 불투명하게 변해 재확인이 어렵습니다. 마니또 이름을 꼭 정확히 기억한 뒤에 닫아주세요!
+                    </p>
+                </div>
+
+                <!-- 모달 제어 하단 버튼 -->
+                <div class="flex gap-3">
+                    <button id="btnConfirmClose" onclick="confirmSecretReveal()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 rounded-2xl transition-all shadow-md text-sm hidden">
+                        <i class="fa-solid fa-lock-open mr-1"></i> 확인 완료 (기억했습니다!)
+                    </button>
+                    <button id="btnSkipReveal" onclick="closeRevealModal()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3.5 rounded-2xl transition-all text-sm">
+                        다음에 확인할게요 (취소)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 알림창(Toast) -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-900 text-white py-3 px-5 rounded-2xl shadow-xl flex items-center gap-2.5 font-bold text-sm">
+            <span id="toastIcon">🔔</span>
+            <span id="toastMessage">알림 메시지입니다.</span>
+        </div>
+    </div>
+
+
+    <script>
+        // 전역 상태 변수
+        let participants = []; // { id, name, originalText }
+        let manittoMap = {};   // { giver: receiver }
+        let checkedUsers = new Set(); // 비밀 확인을 마친 기버들의 목록
+        let activeGiver = null; // 현재 확인 모달창을 켠 기버
+
+        // 샘플 데이터
+        const SAMPLE_LIST = `10101 강지수\n10102 김도원\n10103 박민재\n10104 신예은\n10105 오수민\n10106 윤성현\n10107 이민우\n10108 정서윤\n10109 한태양\n10110 황지훈`;
+
+        // 사운드 시뮬레이터 클래스 (Web Audio API 사용, 별도 MP3 불필요)
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            playBeep(freq, type, duration) {
+                try {
+                    this.init();
+                    let osc = this.ctx.createOscillator();
+                    let gain = this.ctx.createGain();
+                    osc.type = type || 'sine';
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch (e) {
+                    console.log("Audio not supported yet.");
+                }
+            }
+            playTick() {
+                this.playBeep(440, 'triangle', 0.08);
+            }
+            playSuccess() {
+                setTimeout(() => this.playBeep(523.25, 'sine', 0.2), 0); // C5
+                setTimeout(() => this.playBeep(659.25, 'sine', 0.2), 150); // E5
+                setTimeout(() => this.playBeep(783.99, 'sine', 0.4), 300); // G5
+            }
+        }
+        const sfx = new SoundFX();
+
+        // 알림 메시지 노출용 토스트 구현 (alert 대체)
+        function showToast(message, icon = "🔔") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = message;
+            document.getElementById('toastIcon').innerText = icon;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // 샘플 목록 채워넣기
+        function loadSampleList() {
+            document.getElementById('participantInput').value = SAMPLE_LIST;
+            showToast("예시 명렬표를 불러왔습니다!", "📋");
+        }
+
+        // 마니또 교란 순열(Derangement) 생성 - 자기 자신을 지목하지 않도록 하는 안전 알고리즘
+        function calculateManitto(list) {
+            let attempts = 0;
+            const maxAttempts = 1000;
+
+            while (attempts < maxAttempts) {
+                attempts++;
+                let receivers = [...list];
+                
+                // Fisher-Yates 셔플 연산
+                for (let i = receivers.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [receivers[i], receivers[j]] = [receivers[j], receivers[i]];
+                }
+
+                // 무결성 검증 (자신이 자신을 매칭하지 않는지 여부)
+                let isValid = true;
+                for (let i = 0; i < list.length; i++) {
+                    if (list[i].id === receivers[i].id) {
+                        isValid = false;
+                        break;
+                    }
+                }
+
+                if (isValid) {
+                    // 기버 -> 리시버 맵 구성
+                    let map = {};
+                    for (let i = 0; i < list.length; i++) {
+                        map[list[i].id] = receivers[i];
+                    }
+                    return map;
+                }
+            }
+            return null; // 실패 시
+        }
+
+        // 매칭 시작 버튼 동작
+        function startMatchingProcess() {
+            sfx.init(); // 사용자 인터랙션 후 오디오 활성화
+            const text = document.getElementById('participantInput').value.trim();
+            if (!text) {
+                showToast("명렬표에 참가자 학번과 이름을 입력해주세요.", "⚠️");
+                return;
+            }
+
+            // 파싱 처리
+            const lines = text.split('\n');
+            const parsedList = [];
+            
+            lines.forEach((line, index) => {
+                const cleanLine = line.trim().replace(/\s+/g, ' ');
+                if (!cleanLine) return;
+
+                // 정규식 매칭 혹은 단순 쪼개기로 공백 기반 학번/이름 추출
+                const parts = cleanLine.split(' ');
+                if (parts.length >= 2) {
+                    const id = parts[0]; // 학번/번호
+                    const name = parts.slice(1).join(' '); // 이름
+                    parsedList.push({ id: id, name: name, originalText: cleanLine });
+                } else if (parts.length === 1 && parts[0]) {
+                    // 학번이 따로 없는 경우를 위한 임시 아이디 부여
+                    parsedList.push({ id: `N${index+1}`, name: parts[0], originalText: parts[0] });
+                }
+            });
+
+            if (parsedList.length < 3) {
+                showToast("최소 3명 이상의 참가자가 필요합니다.", "⚠️");
+                return;
+            }
+
+            // 고유성(학번 기준 중복 방지) 검사
+            const ids = parsedList.map(p => p.id);
+            if (new Set(ids).size !== ids.length) {
+                showToast("동일한 학번/번호를 가진 중복 데이터가 존재합니다. 고유하게 지정해 주세요.", "⚠️");
+                return;
+            }
+
+            // 마니또 계산 돌리기
+            const matches = calculateManitto(parsedList);
+            if (!matches) {
+                showToast("유효한 매칭을 만드는 데 실패했습니다. 목록을 재확인하고 다시 시작해주세요.", "❌");
+                return;
+            }
+
+            // 상태 할당 및 저장
+            participants = parsedList;
+            manittoMap = matches;
+            checkedUsers.clear();
+
+            // 전광판 갱신
+            updateUIForActiveState();
+            
+            // 완성 성공 연출
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+            sfx.playSuccess();
+            showToast("성공적으로 마니또 매칭을 완료했습니다! 🎉", "💖");
+        }
+
+        // 추첨 완료 후 전광판 UI로 상태 변환
+        function updateUIForActiveState() {
+            document.getElementById('statusEmpty').classList.add('hidden');
+            document.getElementById('statusActive').classList.remove('hidden');
+            document.getElementById('btnReset').classList.remove('hidden');
+            
+            // 입력 폼 비활성화
+            document.getElementById('participantInput').disabled = true;
+            document.getElementById('btnGenerate').disabled = true;
+            document.getElementById('btnGenerate').classList.add('opacity-40', 'cursor-not-allowed');
+
+            renderCards();
+            updateStats();
+        }
+
+        // 전광판 카드 목록 그리기
+        function renderCards() {
+            const grid = document.getElementById('cardGrid');
+            grid.innerHTML = '';
+
+            participants.forEach(user => {
+                const isChecked = checkedUsers.has(user.id);
+                
+                // 각 참가자 카드 생성
+                const cardWrapper = document.createElement('div');
+                cardWrapper.className = `perspective-1000 cursor-pointer h-24 sm:h-28`;
+                cardWrapper.onclick = () => openRevealModal(user.id);
+
+                cardWrapper.innerHTML = `
+                    <div class="relative w-full h-full transition-transform duration-500 transform-style-3d ${isChecked ? 'opacity-50' : ''}">
+                        <!-- 카드 앞면 (확인 전) -->
+                        <div class="absolute inset-0 rounded-2xl border-2 ${isChecked ? 'bg-slate-100 border-slate-300' : 'bg-gradient-to-br from-rose-50 to-amber-50 border-rose-200'} p-3 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                            <span class="text-xs font-bold text-slate-400 mb-1">${user.id}</span>
+                            <span class="font-bold text-slate-700 text-sm sm:text-base">${user.name}</span>
+                            <div class="mt-1.5 flex items-center gap-1">
+                                <span class="text-[10px] ${isChecked ? 'bg-slate-200 text-slate-500' : 'bg-rose-100 text-rose-600'} px-2 py-0.5 rounded-full font-bold">
+                                    ${isChecked ? '<i class="fa-solid fa-check"></i> 확인완료' : '<i class="fa-solid fa-envelope"></i> 시크릿확인'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(cardWrapper);
+            });
+        }
+
+        // 진행률 업데이트
+        function updateStats() {
+            const countText = `${checkedUsers.size} / ${participants.length} 명`;
+            document.getElementById('checkedCount').innerText = countText;
+        }
+
+        // 시크릿 확인 모달 팝업 열기
+        function openRevealModal(giverId) {
+            // 이미 확인했는지 물어보고 재확인 여부 결정
+            if (checkedUsers.has(giverId)) {
+                showToast("이미 마니또를 안전하게 확인 완료한 참여자입니다.", "🔒");
+                return;
+            }
+
+            activeGiver = participants.find(p => p.id === giverId);
+            if (!activeGiver) return;
+
+            // 모달 텍스트 설정
+            document.getElementById('modalUserGiver').innerHTML = `
+                <span class="bg-white/20 px-2 py-0.5 rounded-lg mr-1 text-xs">${activeGiver.id}</span>
+                <span class="font-bold text-base text-yellow-100">${activeGiver.name}</span> 님의 시크릿 보관함
+            `;
+
+            // 모달 초기 상태 설정 (애니메이션 스테이지 켜기, 결과 닫기)
+            document.getElementById('animationStage').classList.remove('hidden');
+            document.getElementById('resultStage').classList.add('hidden');
+            document.getElementById('btnConfirmClose').classList.add('hidden');
+            document.getElementById('btnSkipReveal').classList.remove('hidden');
+
+            // 모달 노출 애니메이션
+            const modal = document.getElementById('drawModal');
+            const modalContent = document.getElementById('modalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 50);
+
+            // 룰렛 스피닝 구현 시작
+            startRouletteAnimation();
+        }
+
+        // 룰렛 휠 스피닝 로직
+        function startRouletteAnimation() {
+            const track = document.getElementById('rouletteTrack');
+            track.innerHTML = '';
+
+            // 랜덤 대상 리스트 생성 (시각적 혼동 효과를 주기 위해 실제 리스트를 여러 번 섞어 트랙 생성)
+            const fakePool = [];
+            for (let k = 0; k < 4; k++) {
+                participants.forEach(p => {
+                    if (p.id !== activeGiver.id) {
+                        fakePool.push(p.name);
+                    }
+                });
+            }
+            
+            // 마지막에 매칭될 실제 타겟의 이름을 최종 목적지 근처에 장식
+            const realTarget = manittoMap[activeGiver.id];
+            
+            // 룰렛 트랙 엘리먼트들 세팅
+            fakePool.forEach(name => {
+                const item = document.createElement('div');
+                item.className = 'h-20 flex items-center justify-center text-rose-100 shrink-0';
+                item.innerText = name;
+                track.appendChild(item);
+            });
+
+            // 스피닝 트랙 속도 애니메이션 조작
+            track.className = "flex flex-col text-white font-bold text-xl tracking-wide absolute text-center w-full animate-spin-fast";
+            
+            let totalTime = 0;
+            const timerInterval = 100; // 사운드 반응 밀도
+            let tickTimer = setInterval(() => {
+                totalTime += timerInterval;
+                sfx.playTick(); // 매 정해진 텀마다 틱음 발생
+                
+                // 가속 제어
+                if (totalTime > 1200 && totalTime <= 2000) {
+                    track.className = "flex flex-col text-white font-bold text-xl tracking-wide absolute text-center w-full animate-spin-medium";
+                } else if (totalTime > 2000 && totalTime <= 3000) {
+                    track.className = "flex flex-col text-white font-bold text-xl tracking-wide absolute text-center w-full animate-spin-slow";
+                } else if (totalTime > 3000) {
+                    clearInterval(tickTimer);
+                    // 스피너 멈추고 최종 매칭결과 출력 스테이지로 교체
+                    showRouletteResult(realTarget);
+                }
+            }, timerInterval);
+        }
+
+        // 스피너 종료 후 매칭 최종 지목결과 팝업 출력
+        function showRouletteResult(target) {
+            sfx.playSuccess();
+            
+            // 폭죽 이펙트 터뜨리기 (모달 주변)
+            confetti({
+                particleCount: 40,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0.3, y: 0.6 }
+            });
+            confetti({
+                particleCount: 40,
+                angle: 120,
+                spread: 55,
+                origin: { x: 0.7, y: 0.6 }
+            });
+
+            // UI 스테이지 체인지
+            document.getElementById('animationStage').classList.add('hidden');
+            const resultStage = document.getElementById('resultStage');
+            resultStage.classList.remove('hidden');
+
+            // 지목된 마니또 정보 표기
+            document.getElementById('targetName').innerHTML = `
+                <span class="text-sm text-amber-500 font-bold block mb-1">${target.id}</span>
+                ${target.name}
+            `;
+
+            // 확인 완료 단추 및 취소 단추 갱신
+            document.getElementById('btnConfirmClose').classList.remove('hidden');
+            document.getElementById('btnSkipReveal').classList.add('hidden'); // 일단 확인하면 취소할 수 없음
+        }
+
+        // '기억했습니다' 확인 완료를 누르면, 확인 세트에 저장하고 모달 닫기
+        function confirmSecretReveal() {
+            if (activeGiver) {
+                checkedUsers.add(activeGiver.id);
+            }
+            closeRevealModal();
+            renderCards();
+            updateStats();
+
+            // 모든 대상들이 매칭결과를 전부 비밀리에 열람했는지 체크
+            if (checkedUsers.size === participants.length) {
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 150,
+                        spread: 80,
+                        origin: { y: 0.4 }
+                    });
+                    showToast("모든 참여자가 마니또 확인을 마쳤습니다! 즐거운 활동 되세요! 🎈", "🎉");
+                }, 400);
+            }
+        }
+
+        // 모달창 닫기 (비밀 노출 방지)
+        function closeRevealModal() {
+            const modal = document.getElementById('drawModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                activeGiver = null;
+            }, 250);
+        }
+
+        // 전체 결과 확인 토글링 (관리자용)
+        function toggleShowAllResults() {
+            const container = document.getElementById('allResultsContainer');
+            const icon = document.getElementById('toggleEyeIcon');
+            const text = document.getElementById('toggleText');
+            
+            if (container.classList.contains('hidden')) {
+                // 전체 매칭 리스트 구성해서 주입
+                const list = document.getElementById('allResultsList');
+                list.innerHTML = '';
+                
+                participants.forEach(p => {
+                    const target = manittoMap[p.id];
+                    const li = document.createElement('li');
+                    li.className = 'py-2 flex items-center justify-between text-xs sm:text-sm';
+                    li.innerHTML = `
+                        <span class="font-bold text-slate-700">${p.id} ${p.name}</span>
+                        <span class="text-slate-400 font-bold"><i class="fa-solid fa-arrow-right"></i></span>
+                        <span class="text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100">${target.id} ${target.name}</span>
+                    `;
+                    list.appendChild(li);
+                });
+
+                container.classList.remove('hidden');
+                icon.className = "fa-solid fa-eye-slash";
+                text.innerText = "전체 결과 숨기기";
+            } else {
+                container.classList.add('hidden');
+                icon.className = "fa-solid fa-eye";
+                text.innerText = "전체 결과 한번에 보기";
+            }
+        }
+
+        // 데이터 전체 초기화 (수정 복구)
+        function resetAll() {
+            if (confirm("정말 전체 데이터를 초기화하시겠습니까? (매칭 결과가 완전히 삭제됩니다!)")) {
+                participants = [];
+                manittoMap = {};
+                checkedUsers.clear();
+                activeGiver = null;
+
+                // 폼 초기화
+                document.getElementById('participantInput').disabled = false;
+                document.getElementById('btnGenerate').disabled = false;
+                document.getElementById('btnGenerate').classList.remove('opacity-40', 'cursor-not-allowed');
+                document.getElementById('btnReset').classList.add('hidden');
+
+                // 대시보드 리셋
+                document.getElementById('statusEmpty').classList.remove('hidden');
+                document.getElementById('statusActive').classList.add('hidden');
+                document.getElementById('allResultsContainer').classList.add('hidden');
+                document.getElementById('toggleEyeIcon').className = "fa-solid fa-eye";
+                document.getElementById('toggleText').innerText = "전체 결과 한번에 보기";
+
+                showToast("모든 마니또 설정이 완벽하게 초기화되었습니다.", "🔄");
+            }
+        }
+    </script>
+</body>
+</html>
